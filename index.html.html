@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotizador Denim BC</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222222;
+    --border: #2a2a2a;
+    --accent: #ffffff;
+    --accent2: #3b82f6;
+    --text: #e8e8e8;
+    --muted: #666;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+  }
+
+  .logo span { color: #3b82f6; }
+
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .tab-btn.active {
+    background: #3b82f6;
+    color: #fff;
+  }
+
+  .tab-btn:hover:not(.active) { color: var(--text); background: var(--surface2); }
+
+  /* MAIN LAYOUT */
+  main { max-width: 1200px; margin: 0 auto; padding: 32px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* COTIZADOR */
+  .cotizador-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-header .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #3b82f6;
+  }
+
+  .panel-body { padding: 20px; }
+
+  /* FORM ELEMENTS */
+  .field { margin-bottom: 16px; }
+
+  .field label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .field input:focus,
+  .field select:focus { border-color: #3b82f6; }
+
+  .field input[type="number"] { -moz-appearance: textfield; }
+  .field input[type="number"]::-webkit-outer-spin-button,
+  .field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .field select option { background: var(--surface2); }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 18px 0;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #3b82f6;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #1e3a5f;
+  }
+
+  /* TOGGLE */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .toggle-label {
+    font-size: 11px;
+    color: var(--text);
+    letter-spacing: 0.3px;
+  }
+
+  .toggle {
+    width: 38px; height: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle.on { background: #3b82f6; border-color: #3b82f6; }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .toggle.on::after { transform: translateX(18px); background: #fff; }
+
+  /* RESULTADO */
+  .resultado-panel { display: flex; flex-direction: column; gap: 16px; }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .result-main {
+    padding: 28px;
+    background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+  }
+
+  .result-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .result-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .result-price .currency {
+    font-size: 18px;
+    vertical-align: super;
+    margin-right: 2px;
+    color: var(--muted);
+  }
+
+  .result-price .unit {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .result-sub {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .result-sub span { color: var(--text); }
+
+  .breakdown {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .breakdown-row:last-child { border-bottom: none; }
+
+  .breakdown-row .key { color: var(--muted); }
+  .breakdown-row .val { color: var(--text); font-weight: 500; }
+  .breakdown-row.total-row .key { color: var(--text); font-weight: 600; }
+  .breakdown-row.total-row .val { color: #ffffff; font-size: 14px; }
+  .breakdown-row.margen-row .val { color: var(--success); }
+
+  /* ACTIONS */
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-primary {
+    background: #3b82f6;
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #2563eb; }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { border-color: #3b82f6; color: #3b82f6; }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+  }
+
+  .btn-danger:hover { background: var(--danger); color: #000; }
+
+  /* MATERIAL TOGGLE */
+  .material-toggle {
+    display: flex;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+
+  .mat-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .mat-btn.active { background: #3b82f6; color: #fff; border: 1px solid #3b82f6; }
+  .mat-btn:hover:not(.active) { color: var(--text); }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .badge-ganado { background: #0d2b1a; color: var(--success); border: 1px solid #1a4a2e; }
+  .badge-vencido { background: #2b1010; color: var(--danger); border: 1px solid #4a1a1a; }
+  .badge-cotizado { background: #1a1a0d; color: var(--warning); border: 1px solid #3a3a0d; }
+
+  /* HISTORICO TABLE */
+  .hist-table-wrap { overflow-x: auto; }
+
+  .hist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .hist-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .hist-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .hist-table tr:hover td { background: var(--surface2); }
+
+  .hist-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* SEARCH */
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .search-bar input, .search-bar select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 8px 12px;
+    outline: none;
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .search-bar input:focus, .search-bar select:focus { border-color: #3b82f6; }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+
+  .stat-card .stat-label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .stat-card .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat-card .stat-value.green { color: var(--success); }
+  .stat-card .stat-value.yellow { color: var(--warning); }
+  .stat-card .stat-value.red { color: var(--danger); }
+
+  /* INFO BOX */
+  .info-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid #3b82f6;
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+
+  .empty .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty .empty-title { font-family: 'Syne', sans-serif; font-size: 16px; margin-bottom: 6px; color: var(--text); }
+
+  /* BRONCE SECTION */
+  .bronce-product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .prod-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .prod-chip:hover, .prod-chip.selected {
+    border-color: #3b82f6;
+    background: #0f1929;
+  }
+
+  .prod-chip .chip-name {
+    font-size: 11px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .prod-chip .chip-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #3b82f6;
+  }
+
+  /* DOLAR INFO */
+  .dolar-strip {
+    display: flex;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+    font-size: 11px;
+  }
+
+  .dolar-item { display: flex; gap: 6px; align-items: center; }
+  .dolar-item .d-label { color: var(--muted); }
+  .dolar-item .d-val { color: var(--text); font-weight: 500; }
+  .dolar-item .d-val.accent { color: #3b82f6; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .cotizador-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    main { padding: 16px; }
+    header { padding: 14px 16px; }
+  }
+
+  /* PRINT */
+  @media print {
+    header, .actions, .tab-bar { display: none !important; }
+    body { background: white; color: black; }
+    .panel { border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+
+<div id="login-screen" style="
+  position:fixed; inset:0; background:#0f0f0f;
+  display:flex; align-items:center; justify-content:center;
+  z-index:9999; font-family:'DM Mono',monospace;">
+  <div style="width:320px;">
+    <div style="font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:#fff; margin-bottom:4px;">
+      COTIZADOR<span style="color:#3b82f6;"> DENIM BC</span>
+    </div>
+    <div style="font-size:11px; color:#555; margin-bottom:32px; letter-spacing:1px;">BUTTON COMPANY — USO INTERNO</div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:10px; letter-spacing:1px; text-transform:uppercase; color:#555; display:block; margin-bottom:6px;">Contraseña</label>
+      <input id="login-input" type="password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') checkPassword()"
+        style="width:100%; background:#181818; border:1px solid #2a2a2a; border-radius:6px;
+               color:#e8e8e8; font-family:'DM Mono',monospace; font-size:14px;
+               padding:10px 14px; outline:none; box-sizing:border-box;">
+    </div>
+    <div id="login-error" style="color:#f87171; font-size:11px; margin-bottom:10px; min-height:16px;"></div>
+    <button onclick="checkPassword()" style="
+      width:100%; background:#3b82f6; color:#fff; border:none; border-radius:6px;
+      font-family:'DM Mono',monospace; font-size:12px; font-weight:500;
+      letter-spacing:1px; text-transform:uppercase; padding:11px;
+      cursor:pointer;">Ingresar</button>
+  </div>
+</div>
+
+<script>
+  const PASS_ADMIN = 'button2026';
+  const PASS_USER  = 'denim2026';
+  let esAdmin = false;
+
+  function checkPassword() {
+    const val = document.getElementById('login-input').value;
+    if (val === PASS_ADMIN) {
+      esAdmin = true;
+      document.getElementById('login-screen').style.display = 'none';
+      mostrarTabsSegunRol();
+    } else if (val === PASS_USER) {
+      esAdmin = false;
+      document.getElementById('login-screen').style.display = 'none';
+      mostrarTabsSegunRol();
+    } else {
+      document.getElementById('login-error').textContent = 'Contraseña incorrecta';
+      document.getElementById('login-input').value = '';
+      document.getElementById('login-input').focus();
+    }
+  }
+
+  function mostrarTabsSegunRol() {
+    const btnPrecios = document.getElementById('tab-btn-precios');
+    if (!esAdmin) {
+      btnPrecios.style.display = 'none';
+    } else {
+      btnPrecios.style.display = '';
+    }
+  }
+
+  window.addEventListener('load', () => document.getElementById('login-input').focus());
+</script>
+
+<header>
+  <div class="logo">COTIZADOR<span> DENIM BC</span></div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('cotizador')">Cotizar</button>
+    <button class="tab-btn" onclick="showTab('historico')">Histórico</button>
+    <button id="tab-btn-precios" class="tab-btn" onclick="showTab('precios')">Precios</button>
+  </div>
+  <div style="font-size:11px; color:var(--muted); font-family:'DM Mono',monospace;">v2026</div>
+</header>
+
+<main>
+  <!-- ===== COTIZADOR ===== -->
+  <section id="tab-cotizador" class="section active">
+
+    <div class="dolar-strip">
+      <div class="dolar-item">
+        <span class="d-label">Oficial ROFEX 120:</span>
+        <span class="d-val accent" id="d-oficial">$1.560</span>
+      </div>
+      <div class="dolar-item">
+        <span class="d-label">Blue:</span>
+        <span class="d-val" id="d-blue">$1.420</span>
+      </div>
+      <div class="dolar-item">
+        <span class="d-label">Button:</span>
+        <span class="d-val" id="d-button">$1.420</span>
+      </div>
+      <div style="flex:1"></div>
+      <button class="btn btn-secondary" onclick="showTab('precios')" style="padding:5px 12px; font-size:10px;">
+        ⚙ Actualizar dólares
+      </button>
+    </div>
+
+    <div class="cotizador-grid">
+
+      <!-- PANEL IZQUIERDO: INPUTS -->
+      <div>
+        <!-- Material selector -->
+        <div class="material-toggle">
+          <button class="mat-btn active" id="mat-zamak" onclick="setMaterial('zamak')">⚙ Zamak</button>
+          <button class="mat-btn" id="mat-bronce" onclick="setMaterial('bronce')">🔶 Bronce</button>
+        </div>
+
+        <!-- ZAMAK FORM -->
+        <div id="form-zamak" class="panel">
+          <div class="panel-header"><div class="dot"></div>Parámetros del producto</div>
+          <div class="panel-body">
+
+            <div class="field">
+              <label>Cliente</label>
+              <input type="text" id="z-cliente" placeholder="Nombre del cliente" oninput="calcular()">
+            </div>
+
+            <div class="field">
+              <label>Observaciones / Nro. Ficha</label>
+              <input type="text" id="z-obs" placeholder="FMG0001, descripción..." oninput="calcular()">
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>Vendedor</label>
+                <input type="text" id="z-vendedor" placeholder="Nombre" oninput="calcular()">
+              </div>
+              <div class="field">
+                <label>Producto</label>
+                <select id="z-producto" onchange="calcular()">
+                  <option value="Grifa">Grifa</option>
+                  <option value="Botón jean">Botón jean</option>
+                  <option value="Botón ojal/pie">Botón ojal/pie</option>
+                  <option value="Remache">Remache</option>
+                  <option value="Chapa/contrachapa">Chapa/contrachapa</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>Cantidad</label>
+                <input type="number" id="z-cantidad" value="10000" oninput="calcular()">
+              </div>
+              <div class="field">
+                <label>Peso unit (g)</label>
+                <input type="number" id="z-peso" value="2" step="0.1" oninput="calcular()">
+              </div>
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Matriz</div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>Tipo de matriz</label>
+                <select id="z-tipoMatriz" onchange="updateMatrizCosto()">
+                  <option value="Existente">Existente</option>
+                  <option value="Nueva-Simple">Nueva — Simple</option>
+                  <option value="Nueva-Doble">Nueva — Doble</option>
+                  <option value="Nueva-Estandarizacion">Nueva — Estandarización</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Bocas / Cavidades</label>
+                <input type="number" id="z-bocas" value="6" min="1" oninput="calcular()">
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Costo matriz total (ARS) <span style="color:var(--accent);font-size:9px;letter-spacing:1px;">AUTO</span></label>
+              <input type="number" id="z-costoMatriz" value="0" readonly style="opacity:0.55; cursor:not-allowed; background:var(--bg);">
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Inyección &amp; Acabados</div>
+
+            <div class="field">
+              <label>Nivel Rotofinish</label>
+              <select id="z-roto" onchange="calcular()">
+                <option value="0">Sin rotofinish</option>
+                <option value="1">Nivel 1</option>
+                <option value="2" selected>Nivel 2</option>
+                <option value="3">Nivel 3</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Bañador (galvano)</label>
+              <select id="z-banador" onchange="calcular()">
+                <option value="0">Sin baño</option>
+                <option value="Balarino" selected>Balarino</option>
+                <option value="Lirosi">Lirosi</option>
+                <option value="Metalquimica">Metalquímica</option>
+              </select>
+            </div>
+
+            <div class="toggle-row">
+              <span class="toggle-label">Armado</span>
+              <div class="toggle" id="tog-armado" onclick="toggleArmado()"></div>
+            </div>
+
+            <div class="toggle-row">
+              <span class="toggle-label">Base + Pinche</span>
+              <div class="toggle on" id="tog-bp" onclick="toggleBP()"></div>
+            </div>
+
+            <div id="bp-selector" class="field-row">
+              <div class="field">
+                <label>Base</label>
+                <select id="z-base" onchange="calcular()">
+                  <option value="0">Sin base</option>
+                  <option value="BASE14">Base 14</option>
+                  <option value="BASE17" selected>Base 17</option>
+                  <option value="BASE19">Base 19</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Pinche</label>
+                <select id="z-pinche" onchange="calcular()">
+                  <option value="0">Sin pinche</option>
+                  <option value="PINAL01">Pinal 01</option>
+                  <option value="PINAL03">Pinal 03</option>
+                  <option value="ATRAQ01" selected>Atraq 01</option>
+                </select>
+              </div>
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Precio</div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>MUP (mark-up)</label>
+                <input type="number" id="z-mup" value="2.2" step="0.05" oninput="calcular()">
+              </div>
+              <div class="field">
+                <label>Adicional unit (ARS)</label>
+                <input type="number" id="z-adicional" value="0" oninput="calcular()">
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Tipo de cambio a usar</label>
+              <select id="z-dolar" onchange="calcular()">
+                <option value="oficial">Oficial ROFEX 120</option>
+                <option value="blue">Blue</option>
+                <option value="button" selected>Button</option>
+              </select>
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Para el cliente</div>
+
+            <div class="field">
+              <label>Demora de entrega</label>
+              <input type="text" id="z-demora" placeholder="Ej: 15 días hábiles" oninput="calcular()">
+            </div>
+
+            <div class="field">
+              <label>Condición de pago</label>
+              <input type="text" id="z-condpago" placeholder="Ej: 50% adelanto, 50% entrega" oninput="calcular()">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- BRONCE FORM -->
+        <div id="form-bronce" class="panel" style="display:none;">
+          <div class="panel-header"><div class="dot" style="background:var(--accent2)"></div>Parámetros Bronce</div>
+          <div class="panel-body">
+
+            <div class="field">
+              <label>Cliente</label>
+              <input type="text" id="b-cliente" placeholder="Nombre del cliente" oninput="calcularBronce()">
+            </div>
+
+            <div class="field">
+              <label>Observaciones / Nro. Ficha</label>
+              <input type="text" id="b-obs" placeholder="FMJ0001, descripción..." oninput="calcularBronce()">
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>Vendedor</label>
+                <input type="text" id="b-vendedor" placeholder="Nombre" oninput="calcularBronce()">
+              </div>
+              <div class="field">
+                <label>Cantidad</label>
+                <input type="number" id="b-cantidad" value="10000" oninput="calcularBronce()">
+              </div>
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Producto</div>
+
+            <div class="field">
+              <label>Tipo de producto</label>
+              <select id="b-producto" onchange="calcularBronce()">
+                <option value="Bronce 17">Bronce 17</option>
+                <option value="Bronce 17 (sin baño)">Bronce 17 (sin baño)</option>
+                <option value="Bronce 19">Bronce 19</option>
+                <option value="Bronce 19 (sin baño)">Bronce 19 (sin baño)</option>
+                <option value="Levis">Levis</option>
+                <option value="Levis (sin baño)">Levis (sin baño)</option>
+                <option value="Fiorucci">Fiorucci</option>
+                <option value="Fiorucci (sin baño)">Fiorucci (sin baño)</option>
+                <option value="Puntera 20 mm">Puntera 20 mm</option>
+                <option value="Cocodrilo 10 mm">Cocodrilo 10 mm</option>
+                <option value="Cocodrilo 20 mm">Cocodrilo 20 mm</option>
+              </select>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>Tipo de matriz</label>
+                <select id="b-tipoMatriz" onchange="calcularBronce()">
+                  <option value="Existente">Existente</option>
+                  <option value="Nueva">Nueva</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Bocas</label>
+                <input type="number" id="b-bocas" value="1" min="1" oninput="calcularBronce()">
+              </div>
+            </div>
+
+            <div class="toggle-row" style="margin-top:4px;">
+              <span class="toggle-label">Esmaltado / tratamiento extra</span>
+              <div class="toggle" id="tog-bronce-extra" onclick="toggleBronceExtra()"></div>
+            </div>
+
+            <div id="bronce-extra-field" style="display:none;" class="field">
+              <label>Costo extra unit (ARS)</label>
+              <input type="number" id="b-extra" value="0" oninput="calcularBronce()">
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Precio</div>
+
+            <div class="field-row">
+              <div class="field">
+                <label>MUP</label>
+                <input type="number" id="b-mup" value="2.2" step="0.05" oninput="calcularBronce()">
+              </div>
+              <div class="field">
+                <label>Adicional unit (ARS)</label>
+                <input type="number" id="b-adicional" value="0" oninput="calcularBronce()">
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Tipo de cambio a usar</label>
+              <select id="b-dolar" onchange="calcularBronce()">
+                <option value="oficial">Oficial ROFEX 120</option>
+                <option value="blue">Blue</option>
+                <option value="button" selected>Button</option>
+              </select>
+            </div>
+
+            <hr class="divider">
+            <div class="section-label">Para el cliente</div>
+
+            <div class="field">
+              <label>Demora de entrega</label>
+              <input type="text" id="b-demora" placeholder="Ej: 15 días hábiles" oninput="calcularBronce()">
+            </div>
+
+            <div class="field">
+              <label>Condición de pago</label>
+              <input type="text" id="b-condpago" placeholder="Ej: 50% adelanto, 50% entrega" oninput="calcularBronce()">
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL DERECHO: RESULTADO -->
+      <div class="resultado-panel">
+
+        <!-- RESULTADO PRINCIPAL -->
+        <div class="result-card">
+          <div class="result-main">
+            <div class="result-label">Precio de venta unitario</div>
+            <div class="result-price" id="res-precio">
+              <span class="currency">$</span><span id="res-precio-val">—</span>
+            </div>
+            <div class="result-sub" id="res-total-label">
+              Total pedido: <span id="res-total-val">—</span>
+            </div>
+          </div>
+          <div class="breakdown" id="breakdown-container">
+            <div class="breakdown-row"><span class="key">Costo unit material</span><span class="val" id="bd-material">—</span></div>
+            <div class="breakdown-row"><span class="key">Costo inyección</span><span class="val" id="bd-iny">—</span></div>
+            <div class="breakdown-row"><span class="key">Rotofinish</span><span class="val" id="bd-roto">—</span></div>
+            <div class="breakdown-row"><span class="key">Galvano/baño</span><span class="val" id="bd-galvano">—</span></div>
+            <div class="breakdown-row"><span class="key">Armado</span><span class="val" id="bd-armado">—</span></div>
+            <div class="breakdown-row"><span class="key">Base + Pinche</span><span class="val" id="bd-bp">—</span></div>
+            <div class="breakdown-row"><span class="key">Matriz apliq. unit</span><span class="val" id="bd-matriz">—</span></div>
+            <div class="breakdown-row total-row"><span class="key">Costo total unit</span><span class="val" id="bd-costo-total">—</span></div>
+            <div class="breakdown-row total-row"><span class="key">Precio venta unit (× MUP + adicional)</span><span class="val" id="bd-precio">—</span></div>
+            <div class="breakdown-row margen-row"><span class="key">Margen bruto</span><span class="val" id="bd-margen">—</span></div>
+          </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="actions">
+          <button class="btn btn-primary" onclick="guardarCotizacion()">💾 Guardar cotización</button>
+          <button class="btn btn-secondary" onclick="generarPDF()">📄 Exportar PDF</button>
+          <button class="btn btn-secondary" onclick="limpiarForm()">↺ Limpiar</button>
+        </div>
+
+        <!-- INFO BOX -->
+        <div class="info-box" id="info-box">
+          Completá los parámetros para ver el desglose de costos.
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HISTÓRICO ===== -->
+  <section id="tab-historico" class="section">
+
+    <div class="stats-grid" id="stats-container">
+      <div class="stat-card"><div class="stat-label">Total cotizaciones</div><div class="stat-value" id="st-total">0</div></div>
+      <div class="stat-card"><div class="stat-label">Ganadas</div><div class="stat-value green" id="st-ganadas">0</div></div>
+      <div class="stat-card"><div class="stat-label">Cotizadas</div><div class="stat-value yellow" id="st-cotizadas">0</div></div>
+      <div class="stat-card"><div class="stat-label">Vencidas</div><div class="stat-value red" id="st-vencidas">0</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="dot"></div>Cotizaciones guardadas</div>
+      <div class="panel-body">
+        <div class="search-bar">
+          <input type="text" id="hist-search" placeholder="Buscar por cliente, producto, ficha..." oninput="renderHistorico()">
+          <select id="hist-filter" onchange="renderHistorico()">
+            <option value="">Todos los estados</option>
+            <option value="Cotizado">Cotizado</option>
+            <option value="Ganado">Ganado</option>
+            <option value="Vencido">Vencido</option>
+          </select>
+          <button class="btn btn-danger" onclick="borrarHistorico()">🗑 Borrar todo</button>
+        </div>
+        <div class="hist-table-wrap" id="hist-table-container">
+          <div class="empty">
+            <div class="empty-icon">📋</div>
+            <div class="empty-title">Sin cotizaciones</div>
+            <div>Guardá tu primera cotización desde el cotizador</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRECIOS ===== -->
+  <section id="tab-precios" class="section">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; flex-wrap:wrap;">
+
+      <!-- DÓLARES -->
+      <div class="panel">
+        <div class="panel-header"><div class="dot"></div>Tipo de cambio</div>
+        <div class="panel-body">
+          <div class="field">
+            <label>Oficial ROFEX 120 (ARS)</label>
+            <input type="number" id="cfg-dolar-oficial" value="1560" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Blue (ARS)</label>
+            <input type="number" id="cfg-dolar-blue" value="1420" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Button (ARS)</label>
+            <input type="number" id="cfg-dolar-button" value="1420" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Zamak kg (USD)</label>
+            <input type="number" id="cfg-zamak-usd" value="5.38" step="0.01" oninput="savePrecios()">
+          </div>
+          <div class="info-box" style="margin-top:0;">
+            Estos valores se usan en todos los cálculos. Actualizalos periódicamente.
+          </div>
+        </div>
+      </div>
+
+      <!-- MATRICES ZAMAK -->
+      <div class="panel">
+        <div class="panel-header"><div class="dot"></div>Matrices Zamak (ARS)</div>
+        <div class="panel-body">
+          <div class="field">
+            <label>Simple</label>
+            <input type="number" id="cfg-matriz-simple" value="550000" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Doble</label>
+            <input type="number" id="cfg-matriz-doble" value="905000" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Estandarización</label>
+            <input type="number" id="cfg-matriz-est" value="485000" oninput="savePrecios()">
+          </div>
+        </div>
+      </div>
+
+      <!-- GOLPE -->
+      <div class="panel">
+        <div class="panel-header"><div class="dot"></div>Golpe Zamak (ARS/golpe)</div>
+        <div class="panel-body">
+          <div class="field">
+            <label>6.000 golpes</label>
+            <input type="number" id="cfg-golpe-6000" value="112" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>3.000 golpes</label>
+            <input type="number" id="cfg-golpe-3000" value="158" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>1.500 golpes</label>
+            <input type="number" id="cfg-golpe-1500" value="210" oninput="savePrecios()">
+          </div>
+        </div>
+      </div>
+
+      <!-- ROTOFINISH -->
+      <div class="panel">
+        <div class="panel-header"><div class="dot"></div>Rotofinish Zamak (ARS/kg)</div>
+        <div class="panel-body">
+          <div class="field">
+            <label>Nivel 1</label>
+            <input type="number" id="cfg-roto-1" value="2389" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Nivel 2</label>
+            <input type="number" id="cfg-roto-2" value="3088" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Nivel 3</label>
+            <input type="number" id="cfg-roto-3" value="4258" oninput="savePrecios()">
+          </div>
+        </div>
+      </div>
+
+      <!-- BAÑADORES -->
+      <div class="panel">
+        <div class="panel-header"><div class="dot"></div>Bañadores (ARS/kg)</div>
+        <div class="panel-body">
+          <div class="field">
+            <label>Balarino</label>
+            <input type="number" id="cfg-ban-balarino" value="14000" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Lirosi</label>
+            <input type="number" id="cfg-ban-lirosi" value="7000" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Metalquímica</label>
+            <input type="number" id="cfg-ban-metalquimica" value="12000" oninput="savePrecios()">
+          </div>
+          <div class="field">
+            <label>Armado (ARS/unit)</label>
+            <input type="number" id="cfg-armado" value="38" oninput="savePrecios()">
+          </div>
+        </div>
+      </div>
+
+      <!-- BASE + PINCHE -->
+      <div class="panel">
+        <div class="panel-header"><div class="dot"></div>Base + Pinche Zamak (ARS/unit)</div>
+        <div class="panel-body">
+          <div class="field-row">
+            <div class="field">
+              <label>Base 14</label>
+              <input type="number" id="cfg-base14" value="9.656" step="0.001" oninput="savePrecios()">
+            </div>
+            <div class="field">
+              <label>Base 17</label>
+              <input type="number" id="cfg-base17" value="11.786" step="0.001" oninput="savePrecios()">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Base 19</label>
+              <input type="number" id="cfg-base19" value="12.78" step="0.001" oninput="savePrecios()">
+            </div>
+            <div class="field">
+              <label>Pinal 01</label>
+              <input type="number" id="cfg-pinal01" value="2.982" step="0.001" oninput="savePrecios()">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Pinal 03</label>
+              <input type="number" id="cfg-pinal03" value="2.982" step="0.001" oninput="savePrecios()">
+            </div>
+            <div class="field">
+              <label>Atraq 01</label>
+              <input type="number" id="cfg-atraq01" value="9.656" step="0.001" oninput="savePrecios()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BRONCE PRECIOS -->
+      <div class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-header"><div class="dot" style="background:var(--accent2)"></div>Productos Bronce (ARS/millar)</div>
+        <div class="panel-body">
+          <div class="field-row-3">
+            <div class="field"><label>Bronce 17</label><input type="number" id="cfg-b17" value="48400" oninput="savePrecios()"></div>
+            <div class="field"><label>Bronce 17 (sin baño)</label><input type="number" id="cfg-b17sb" value="39919.6" oninput="savePrecios()"></div>
+            <div class="field"><label>Bronce 19</label><input type="number" id="cfg-b19" value="74000" oninput="savePrecios()"></div>
+          </div>
+          <div class="field-row-3">
+            <div class="field"><label>Bronce 19 (sin baño)</label><input type="number" id="cfg-b19sb" value="61649.6" oninput="savePrecios()"></div>
+            <div class="field"><label>Levis</label><input type="number" id="cfg-levis" value="18235" oninput="savePrecios()"></div>
+            <div class="field"><label>Levis (sin baño)</label><input type="number" id="cfg-levissb" value="16187" oninput="savePrecios()"></div>
+          </div>
+          <div class="field-row-3">
+            <div class="field"><label>Fiorucci</label><input type="number" id="cfg-fiorucci" value="23300" oninput="savePrecios()"></div>
+            <div class="field"><label>Fiorucci (sin baño)</label><input type="number" id="cfg-fioruccisb" value="21991.56" oninput="savePrecios()"></div>
+            <div class="field"><label>Puntera 20 mm</label><input type="number" id="cfg-puntera" value="40315" oninput="savePrecios()"></div>
+          </div>
+          <div class="field-row-3">
+            <div class="field"><label>Cocodrilo 10 mm</label><input type="number" id="cfg-coco10" value="42900" oninput="savePrecios()"></div>
+            <div class="field"><label>Cocodrilo 20 mm</label><input type="number" id="cfg-coco20" value="84383" oninput="savePrecios()"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUÑOS BRONCE -->
+      <div class="panel">
+        <div class="panel-header"><div class="dot" style="background:var(--accent2)"></div>Cuños Bronce (ARS/unidad)</div>
+        <div class="panel-body">
+          <div class="field-row">
+            <div class="field"><label>Bronce 17</label><input type="number" id="cfg-cuno-b17" value="65000" oninput="savePrecios()"></div>
+            <div class="field"><label>Bronce 19</label><input type="number" id="cfg-cuno-b19" value="75000" oninput="savePrecios()"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Levis</label><input type="number" id="cfg-cuno-levis" value="60000" oninput="savePrecios()"></div>
+            <div class="field"><label>Fiorucci</label><input type="number" id="cfg-cuno-fiorucci" value="60000" oninput="savePrecios()"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- ===== MODAL ESTADO ===== -->
+<div id="modal-estado" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:999; align-items:center; justify-content:center;">
+  <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:28px; width:340px;">
+    <div style="font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:16px;">Guardar cotización</div>
+    <div class="field">
+      <label>Estado</label>
+      <select id="modal-estado-val">
+        <option value="Cotizado">Cotizado</option>
+        <option value="Ganado">Ganado</option>
+        <option value="Vencido">Vencido</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="confirmarGuardar()">Guardar</button>
+      <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==============================
+//  ESTADO & STORAGE
+// ==============================
+let material = 'zamak';
+let pendingCotizacion = null;
+
+const STORAGE_KEY = 'btn_cotizaciones_v2';
+const PRECIOS_KEY = 'btn_precios_v2';
+
+function getHistorico() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
+}
+
+function saveHistorico(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function getPrecios() {
+  try { return JSON.parse(localStorage.getItem(PRECIOS_KEY)) || {}; } catch { return {}; }
+}
+
+function savePrecios() {
+  const p = {};
+  const ids = [
+    'cfg-dolar-oficial','cfg-dolar-blue','cfg-dolar-button','cfg-zamak-usd',
+    'cfg-matriz-simple','cfg-matriz-doble','cfg-matriz-est',
+    'cfg-golpe-6000','cfg-golpe-3000','cfg-golpe-1500',
+    'cfg-roto-1','cfg-roto-2','cfg-roto-3',
+    'cfg-ban-balarino','cfg-ban-lirosi','cfg-ban-metalquimica','cfg-armado',
+    'cfg-base14','cfg-base17','cfg-base19',
+    'cfg-pinal01','cfg-pinal03','cfg-atraq01',
+    'cfg-b17','cfg-b17sb','cfg-b19','cfg-b19sb',
+    'cfg-levis','cfg-levissb','cfg-fiorucci','cfg-fioruccisb',
+    'cfg-puntera','cfg-coco10','cfg-coco20',
+    'cfg-cuno-b17','cfg-cuno-b19','cfg-cuno-levis','cfg-cuno-fiorucci'
+  ];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) p[id] = parseFloat(el.value) || 0;
+  });
+  localStorage.setItem(PRECIOS_KEY, JSON.stringify(p));
+  updateDolarStrip();
+  if (material === 'zamak') calcular();
+  else calcularBronce();
+}
+
+function loadPrecios() {
+  const p = getPrecios();
+  Object.keys(p).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = p[id];
+  });
+  updateDolarStrip();
+}
+
+function getPrecio(id, def) {
+  const p = getPrecios();
+  return p[id] !== undefined ? p[id] : def;
+}
+
+function updateDolarStrip() {
+  const of = getPrecio('cfg-dolar-oficial', 1560);
+  const bl = getPrecio('cfg-dolar-blue', 1420);
+  const bt = getPrecio('cfg-dolar-button', 1420);
+  document.getElementById('d-oficial').textContent = '$' + of.toLocaleString('es-AR');
+  document.getElementById('d-blue').textContent = '$' + bl.toLocaleString('es-AR');
+  document.getElementById('d-button').textContent = '$' + bt.toLocaleString('es-AR');
+}
+
+function getDolar(tipo) {
+  if (tipo === 'oficial') return getPrecio('cfg-dolar-oficial', 1560);
+  if (tipo === 'blue') return getPrecio('cfg-dolar-blue', 1420);
+  return getPrecio('cfg-dolar-button', 1420);
+}
+
+// ==============================
+//  TABS
+// ==============================
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(name.substring(0,4))) b.classList.add('active');
+  });
+  if (name === 'historico') renderHistorico();
+}
+
+// ==============================
+//  MATERIAL TOGGLE
+// ==============================
+function setMaterial(mat) {
+  material = mat;
+  document.getElementById('mat-zamak').classList.toggle('active', mat === 'zamak');
+  document.getElementById('mat-bronce').classList.toggle('active', mat === 'bronce');
+  document.getElementById('form-zamak').style.display = mat === 'zamak' ? '' : 'none';
+  document.getElementById('form-bronce').style.display = mat === 'bronce' ? '' : 'none';
+  if (mat === 'zamak') calcular();
+  else calcularBronce();
+}
+
+// ==============================
+//  TOGGLES
+// ==============================
+function toggleArmado() {
+  const tog = document.getElementById('tog-armado');
+  tog.classList.toggle('on');
+  calcular();
+}
+
+function toggleBP() {
+  const tog = document.getElementById('tog-bp');
+  tog.classList.toggle('on');
+  document.getElementById('bp-selector').style.display = tog.classList.contains('on') ? '' : 'none';
+  calcular();
+}
+
+function toggleBronceExtra() {
+  const tog = document.getElementById('tog-bronce-extra');
+  tog.classList.toggle('on');
+  document.getElementById('bronce-extra-field').style.display = tog.classList.contains('on') ? '' : 'none';
+  calcularBronce();
+}
+
+// ==============================
+//  MATRIZ PRECIOS
+// ==============================
+function updateMatrizCosto() {
+  const tipo = document.getElementById('z-tipoMatriz').value;
+  let precio = 0;
+  if (tipo === 'Nueva-Simple') precio = getPrecio('cfg-matriz-simple', 550000);
+  else if (tipo === 'Nueva-Doble') precio = getPrecio('cfg-matriz-doble', 905000);
+  else if (tipo === 'Nueva-Estandarizacion') precio = getPrecio('cfg-matriz-est', 485000);
+  document.getElementById('z-costoMatriz').value = precio;
+  calcular();
+}
+
+// ==============================
+//  CALCULAR ZAMAK
+// ==============================
+function calcular() {
+  const cantidad = parseFloat(document.getElementById('z-cantidad').value) || 0;
+  const pesoUnit = parseFloat(document.getElementById('z-peso').value) || 0;
+  const bocas = parseFloat(document.getElementById('z-bocas').value) || 1;
+  const mup = parseFloat(document.getElementById('z-mup').value) || 1;
+  const adicional = parseFloat(document.getElementById('z-adicional').value) || 0;
+  const dolarTipo = document.getElementById('z-dolar').value;
+  const dolar = getDolar(dolarTipo);
+
+  const zamakUSD = getPrecio('cfg-zamak-usd', 5.38);
+  const zamakKgARS = zamakUSD * dolar;
+  const consumoUnit = pesoUnit * 1.1; // 10% merma
+  const costoZamakUnit = (consumoUnit / 1000) * zamakKgARS;
+
+  // Inyección (golpe)
+  const golpes = cantidad / bocas;
+  let costoGolpe;
+  if (golpes >= 5000) costoGolpe = getPrecio('cfg-golpe-6000', 112);
+  else if (golpes >= 2500) costoGolpe = getPrecio('cfg-golpe-3000', 158);
+  else costoGolpe = getPrecio('cfg-golpe-1500', 210);
+  const costoInyUnit = (costoGolpe * golpes) / cantidad;
+
+  // Rotofinish
+  const nivelRoto = document.getElementById('z-roto').value;
+  let costoRotoKg = 0;
+  if (nivelRoto === '1') costoRotoKg = getPrecio('cfg-roto-1', 2389);
+  else if (nivelRoto === '2') costoRotoKg = getPrecio('cfg-roto-2', 3088);
+  else if (nivelRoto === '3') costoRotoKg = getPrecio('cfg-roto-3', 4258);
+  const pesoTotalKg = (pesoUnit * cantidad) / 1000;
+  const costoRotoUnit = nivelRoto === '0' ? 0 : (costoRotoKg * pesoTotalKg) / cantidad;
+
+  // Galvano
+  const banador = document.getElementById('z-banador').value;
+  let costoGalvanoPorKg = 0;
+  if (banador === 'Balarino') costoGalvanoPorKg = getPrecio('cfg-ban-balarino', 14000);
+  else if (banador === 'Lirosi') costoGalvanoPorKg = getPrecio('cfg-ban-lirosi', 7000);
+  else if (banador === 'Metalquimica') costoGalvanoPorKg = getPrecio('cfg-ban-metalquimica', 12000);
+  const costoGalvanoUnit = banador === '0' ? 0 : (costoGalvanoPorKg * pesoTotalKg) / cantidad;
+
+  // Armado
+  const tieneArmado = document.getElementById('tog-armado').classList.contains('on');
+  const costoArmadoUnit = tieneArmado ? getPrecio('cfg-armado', 38) : 0;
+
+  // Base + Pinche
+  const tieneBP = document.getElementById('tog-bp').classList.contains('on');
+  let costoBPUnit = 0;
+  if (tieneBP) {
+    const base = document.getElementById('z-base').value;
+    const pinche = document.getElementById('z-pinche').value;
+    let costoBase = 0;
+    if (base === 'BASE14') costoBase = getPrecio('cfg-base14', 9.656);
+    else if (base === 'BASE17') costoBase = getPrecio('cfg-base17', 11.786);
+    else if (base === 'BASE19') costoBase = getPrecio('cfg-base19', 12.78);
+    let costoPinche = 0;
+    if (pinche === 'PINAL01') costoPinche = getPrecio('cfg-pinal01', 2.982);
+    else if (pinche === 'PINAL03') costoPinche = getPrecio('cfg-pinal03', 2.982);
+    else if (pinche === 'ATRAQ01') costoPinche = getPrecio('cfg-atraq01', 9.656);
+    costoBPUnit = costoBase + costoPinche;
+  }
+
+  // Matriz aplicada
+  const costoMatrizTotal = parseFloat(document.getElementById('z-costoMatriz').value) || 0;
+  const costoMatrizUnit = costoMatrizTotal / cantidad;
+
+  // TOTAL
+  const costoUnitTotal = costoZamakUnit + costoInyUnit + costoRotoUnit + costoGalvanoUnit +
+                         costoArmadoUnit + costoBPUnit + costoMatrizUnit;
+  const precioVenta = costoUnitTotal * mup + adicional;
+  const precioTotal = precioVenta * cantidad;
+  const margenBC = precioTotal - (costoUnitTotal * cantidad);
+  const margenPct = precioTotal > 0 ? (margenBC / precioTotal * 100) : 0;
+
+  // Render
+  document.getElementById('res-precio-val').textContent = fmt(precioVenta);
+  document.getElementById('res-total-val').textContent = '$' + fmtTotal(precioTotal) + ' (x' + fmtTotal(cantidad) + ')';
+  document.getElementById('bd-material').textContent = '$' + fmt(costoZamakUnit);
+  document.getElementById('bd-iny').textContent = '$' + fmt(costoInyUnit);
+  document.getElementById('bd-roto').textContent = nivelRoto === '0' ? '—' : '$' + fmt(costoRotoUnit);
+  document.getElementById('bd-galvano').textContent = banador === '0' ? '—' : '$' + fmt(costoGalvanoUnit);
+  document.getElementById('bd-armado').textContent = tieneArmado ? '$' + fmt(costoArmadoUnit) : '—';
+  document.getElementById('bd-bp').textContent = tieneBP ? '$' + fmt(costoBPUnit) : '—';
+  document.getElementById('bd-matriz').textContent = costoMatrizUnit > 0 ? '$' + fmt(costoMatrizUnit) : '—';
+  document.getElementById('bd-costo-total').textContent = '$' + fmt(costoUnitTotal);
+  document.getElementById('bd-precio').textContent = '$' + fmt(precioVenta) + ' (×' + mup + (adicional > 0 ? ' +$' + fmt(adicional) : '') + ')';
+  document.getElementById('bd-margen').textContent = '$' + fmtTotal(margenBC) + ' (' + margenPct.toFixed(1) + '%)';
+
+  const infoEl = document.getElementById('info-box');
+  infoEl.innerHTML = `
+    <strong>Zamak kg:</strong> $${fmt(zamakKgARS)} (USD ${zamakUSD} × $${dolar.toLocaleString('es-AR')} ${dolarTipo})<br>
+    <strong>Golpes:</strong> ${fmtTotal(golpes)} → $${costoGolpe}/golpe<br>
+    <strong>Peso total:</strong> ${pesoTotalKg.toFixed(2)} kg
+  `;
+
+  // Guardar último resultado para exportar
+  window._lastZamak = {
+    cliente: document.getElementById('z-cliente').value,
+    obs: document.getElementById('z-obs').value,
+    vendedor: document.getElementById('z-vendedor').value,
+    producto: document.getElementById('z-producto').value,
+    cantidad, pesoUnit, bocas, mup, adicional,
+    tipoMatriz: document.getElementById('z-tipoMatriz').value,
+    roto: nivelRoto, banador, tieneBP,
+    base: tieneBP ? document.getElementById('z-base').value : '',
+    pinche: tieneBP ? document.getElementById('z-pinche').value : '',
+    tieneArmado,
+    costoZamakUnit, costoInyUnit, costoRotoUnit, costoGalvanoUnit,
+    costoArmadoUnit, costoBPUnit, costoMatrizUnit,
+    costoUnitTotal, precioVenta, precioTotal, margenBC, margenPct,
+    dolarTipo, dolar, material: 'zamak',
+    demora: document.getElementById('z-demora').value,
+    condpago: document.getElementById('z-condpago').value
+  };
+}
+
+// ==============================
+//  CALCULAR BRONCE
+// ==============================
+function calcularBronce() {
+  const cantidad = parseFloat(document.getElementById('b-cantidad').value) || 0;
+  const producto = document.getElementById('b-producto').value;
+  const tipoMatriz = document.getElementById('b-tipoMatriz').value;
+  const bocas = parseFloat(document.getElementById('b-bocas').value) || 1;
+  const mup = parseFloat(document.getElementById('b-mup').value) || 1;
+  const adicional = parseFloat(document.getElementById('b-adicional').value) || 0;
+  const dolarTipo = document.getElementById('b-dolar').value;
+
+  // Precio producto por millar
+  const precioMap = {
+    'Bronce 17': getPrecio('cfg-b17', 48400),
+    'Bronce 17 (sin baño)': getPrecio('cfg-b17sb', 39919.6),
+    'Bronce 19': getPrecio('cfg-b19', 74000),
+    'Bronce 19 (sin baño)': getPrecio('cfg-b19sb', 61649.6),
+    'Levis': getPrecio('cfg-levis', 18235),
+    'Levis (sin baño)': getPrecio('cfg-levissb', 16187),
+    'Fiorucci': getPrecio('cfg-fiorucci', 23300),
+    'Fiorucci (sin baño)': getPrecio('cfg-fioruccisb', 21991.56),
+    'Puntera 20 mm': getPrecio('cfg-puntera', 40315),
+    'Cocodrilo 10 mm': getPrecio('cfg-coco10', 42900),
+    'Cocodrilo 20 mm': getPrecio('cfg-coco20', 84383),
+  };
+
+  const cunoMap = {
+    'Bronce 17': getPrecio('cfg-cuno-b17', 65000),
+    'Bronce 17 (sin baño)': getPrecio('cfg-cuno-b17', 65000),
+    'Bronce 19': getPrecio('cfg-cuno-b19', 75000),
+    'Bronce 19 (sin baño)': getPrecio('cfg-cuno-b19', 75000),
+    'Levis': getPrecio('cfg-cuno-levis', 60000),
+    'Levis (sin baño)': getPrecio('cfg-cuno-levis', 60000),
+    'Fiorucci': getPrecio('cfg-cuno-fiorucci', 60000),
+    'Fiorucci (sin baño)': getPrecio('cfg-cuno-fiorucci', 60000),
+    'Puntera 20 mm': 70000,
+    'Cocodrilo 10 mm': 85000,
+    'Cocodrilo 20 mm': 85000,
+  };
+
+  const precioPorMillar = precioMap[producto] || 0;
+  const costoMPRUnit = precioPorMillar / 1000;
+
+  // Matriz (cuño)
+  let costoMatrizUnit = 0;
+  if (tipoMatriz === 'Nueva') {
+    const cunoPrecio = (cunoMap[producto] || 65000) / bocas;
+    costoMatrizUnit = cunoPrecio / cantidad;
+  }
+
+  // Extra (esmaltado, etc.)
+  const tieneExtra = document.getElementById('tog-bronce-extra').classList.contains('on');
+  const extraUnit = tieneExtra ? (parseFloat(document.getElementById('b-extra').value) || 0) : 0;
+
+  // Base + pinche (Bronce usa base/pinche del producto)
+  // Para botones bronce se carga por separado en el prod price
+  // Aqui los incluimos como referencia si aplica
+  const costoUnitTotal = costoMPRUnit + costoMatrizUnit + extraUnit;
+  const precioVenta = costoUnitTotal * mup + adicional;
+  const precioTotal = precioVenta * cantidad;
+  const margenBC = precioTotal - (costoUnitTotal * cantidad);
+  const margenPct = precioTotal > 0 ? (margenBC / precioTotal * 100) : 0;
+
+  // Render
+  document.getElementById('res-precio-val').textContent = fmt(precioVenta);
+  document.getElementById('res-total-val').textContent = '$' + fmtTotal(precioTotal) + ' (x' + fmtTotal(cantidad) + ')';
+  document.getElementById('bd-material').textContent = '$' + fmt(costoMPRUnit) + ' (MPR)';
+  document.getElementById('bd-iny').textContent = '—';
+  document.getElementById('bd-roto').textContent = '—';
+  document.getElementById('bd-galvano').textContent = tieneExtra ? '$' + fmt(extraUnit) : '—';
+  document.getElementById('bd-armado').textContent = '—';
+  document.getElementById('bd-bp').textContent = '—';
+  document.getElementById('bd-matriz').textContent = costoMatrizUnit > 0 ? '$' + fmt(costoMatrizUnit) + ' (cuño)' : '—';
+  document.getElementById('bd-costo-total').textContent = '$' + fmt(costoUnitTotal);
+  document.getElementById('bd-precio').textContent = '$' + fmt(precioVenta) + ' (×' + mup + (adicional > 0 ? ' +$' + fmt(adicional) : '') + ')';
+  document.getElementById('bd-margen').textContent = '$' + fmtTotal(margenBC) + ' (' + margenPct.toFixed(1) + '%)';
+
+  document.getElementById('info-box').innerHTML = `
+    <strong>${producto}:</strong> $${precioPorMillar.toLocaleString('es-AR')}/millar → $${fmt(costoMPRUnit)}/unit<br>
+    <strong>Tipo de cambio:</strong> ${dolarTipo}
+  `;
+
+  window._lastBronce = {
+    cliente: document.getElementById('b-cliente').value,
+    obs: document.getElementById('b-obs').value,
+    vendedor: document.getElementById('b-vendedor').value,
+    producto, cantidad, bocas, mup, adicional, tipoMatriz,
+    costoMPRUnit, costoMatrizUnit, extraUnit,
+    costoUnitTotal, precioVenta, precioTotal, margenBC, margenPct,
+    dolarTipo, material: 'bronce',
+    demora: document.getElementById('b-demora').value,
+    condpago: document.getElementById('b-condpago').value
+  };
+}
+
+// ==============================
+//  GUARDAR
+// ==============================
+function guardarCotizacion() {
+  const data = material === 'zamak' ? window._lastZamak : window._lastBronce;
+  if (!data || !data.precioVenta) { alert('Completá el cotizador primero.'); return; }
+  pendingCotizacion = data;
+  const modal = document.getElementById('modal-estado');
+  modal.style.display = 'flex';
+}
+
+function cerrarModal() {
+  document.getElementById('modal-estado').style.display = 'none';
+  pendingCotizacion = null;
+}
+
+function confirmarGuardar() {
+  if (!pendingCotizacion) return;
+  const estado = document.getElementById('modal-estado-val').value;
+  const hist = getHistorico();
+  hist.unshift({
+    ...pendingCotizacion,
+    estado,
+    fecha: new Date().toLocaleDateString('es-AR'),
+    id: Date.now()
+  });
+  saveHistorico(hist);
+  cerrarModal();
+  renderHistorico();
+  showTab('historico');
+}
+
+function borrarHistorico() {
+  if (!confirm('¿Borrar todas las cotizaciones guardadas?')) return;
+  saveHistorico([]);
+  renderHistorico();
+}
+
+function cambiarEstado(id, nuevoEstado) {
+  const hist = getHistorico();
+  const idx = hist.findIndex(h => h.id === id);
+  if (idx !== -1) { hist[idx].estado = nuevoEstado; saveHistorico(hist); renderHistorico(); }
+}
+
+function eliminarCotizacion(id) {
+  const hist = getHistorico().filter(h => h.id !== id);
+  saveHistorico(hist);
+  renderHistorico();
+}
+
+// ==============================
+//  RENDER HISTÓRICO
+// ==============================
+function renderHistorico() {
+  let hist = getHistorico();
+  const q = document.getElementById('hist-search').value.toLowerCase();
+  const filtroEstado = document.getElementById('hist-filter').value;
+  if (q) hist = hist.filter(h =>
+    (h.cliente||'').toLowerCase().includes(q) ||
+    (h.producto||'').toLowerCase().includes(q) ||
+    (h.obs||'').toLowerCase().includes(q) ||
+    (h.vendedor||'').toLowerCase().includes(q)
+  );
+  if (filtroEstado) hist = hist.filter(h => h.estado === filtroEstado);
+
+  // Stats
+  const all = getHistorico();
+  document.getElementById('st-total').textContent = all.length;
+  document.getElementById('st-ganadas').textContent = all.filter(h => h.estado === 'Ganado').length;
+  document.getElementById('st-cotizadas').textContent = all.filter(h => h.estado === 'Cotizado').length;
+  document.getElementById('st-vencidas').textContent = all.filter(h => h.estado === 'Vencido').length;
+
+  const cont = document.getElementById('hist-table-container');
+  if (!hist.length) {
+    cont.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Sin cotizaciones</div><div>No hay resultados para este filtro</div></div>`;
+    return;
+  }
+
+  cont.innerHTML = `
+    <table class="hist-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Cliente</th>
+          <th>Vendedor</th>
+          <th>Obs / Ficha</th>
+          <th>Material</th>
+          <th>Producto</th>
+          <th class="num">Cant.</th>
+          <th class="num">Precio unit</th>
+          <th class="num">Total</th>
+          <th class="num">Margen %</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${hist.map(h => `
+          <tr>
+            <td>${h.fecha || '—'}</td>
+            <td>
+              <select onchange="cambiarEstado(${h.id}, this.value)" style="background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'DM Mono',monospace; font-size:10px; padding:2px 6px; border-radius:4px;">
+                <option value="Cotizado" ${h.estado==='Cotizado'?'selected':''}>Cotizado</option>
+                <option value="Ganado" ${h.estado==='Ganado'?'selected':''}>Ganado</option>
+                <option value="Vencido" ${h.estado==='Vencido'?'selected':''}>Vencido</option>
+              </select>
+            </td>
+            <td>${h.cliente || '—'}</td>
+            <td>${h.vendedor || '—'}</td>
+            <td style="max-width:160px; overflow:hidden; text-overflow:ellipsis;">${h.obs || '—'}</td>
+            <td style="text-transform:capitalize;">${h.material}</td>
+            <td>${h.producto}</td>
+            <td class="num">${fmtTotal(h.cantidad)}</td>
+            <td class="num">$${fmt(h.precioVenta)}</td>
+            <td class="num">$${fmtTotal(h.precioTotal)}</td>
+            <td class="num" style="color:${h.margenPct > 45 ? 'var(--success)' : h.margenPct > 30 ? 'var(--warning)' : 'var(--danger)'}">
+              ${h.margenPct ? h.margenPct.toFixed(1) + '%' : '—'}
+            </td>
+            <td>
+              <button onclick="exportarPDFHistorico(${h.id})" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:10px; padding:3px 8px; border-radius:4px; cursor:pointer; font-family:'DM Mono',monospace;" title="Exportar PDF">PDF</button>
+              <button onclick="eliminarCotizacion(${h.id})" style="background:none; border:1px solid #4a1a1a; color:var(--danger); font-size:10px; padding:3px 8px; border-radius:4px; cursor:pointer; margin-left:4px; font-family:'DM Mono',monospace;" title="Eliminar">✕</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ==============================
+//  PDF EXPORT
+// ==============================
+function generarPDF() {
+  const data = material === 'zamak' ? window._lastZamak : window._lastBronce;
+  if (!data || !data.precioVenta) { alert('Completá el cotizador primero.'); return; }
+  abrirPDF(data);
+}
+
+function exportarPDFHistorico(id) {
+  const hist = getHistorico();
+  const data = hist.find(h => h.id === id);
+  if (data) abrirPDF(data);
+}
+
+function abrirPDF(data) {
+  const fecha = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  // Solo filas visibles para el cliente (sin costos internos)
+  let datosRows = [
+    ['Producto', data.producto],
+    ['Cantidad', fmtTotal(data.cantidad) + ' unidades'],
+    ['Precio unitario', '$' + fmt(data.precioVenta)],
+    ['Total pedido', '$' + fmtTotal(data.precioTotal)],
+  ];
+  if (data.demora) datosRows.push(['Demora de entrega', data.demora]);
+  if (data.condpago) datosRows.push(['Condición de pago', data.condpago]);
+
+  // Usar jsPDF vía CDN
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  script.onload = () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pw = 210; // ancho A4
+    const margin = 18;
+    const col2x = pw - margin;
+    let y = 20;
+
+    // Header
+    doc.setFillColor(17, 17, 17);
+    doc.rect(0, 0, pw, 28, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('BTN·COTIZADOR', margin, 12);
+    doc.setTextColor(180, 180, 180);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Button Company — Uso interno', margin, 18);
+    doc.setTextColor(200, 200, 200);
+    doc.text('Fecha: ' + (data.fecha || fecha), col2x, 10, { align: 'right' });
+    if (data.cliente) doc.text('Cliente: ' + data.cliente, col2x, 15, { align: 'right' });
+    if (data.vendedor) doc.text('Vendedor: ' + data.vendedor, col2x, 20, { align: 'right' });
+    if (data.obs) doc.text('Ref: ' + data.obs, col2x, 25, { align: 'right' });
+
+    y = 38;
+
+    // Caja precio principal
+    doc.setFillColor(245, 245, 245);
+    doc.roundedRect(margin, y, pw - margin*2, 26, 2, 2, 'F');
+    doc.setDrawColor(17, 17, 17);
+    doc.setLineWidth(0.8);
+    doc.line(margin, y, margin, y + 26);
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('PRECIO DE VENTA UNITARIO', margin + 5, y + 7);
+    doc.setTextColor(17, 17, 17);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('$' + fmt(data.precioVenta), margin + 5, y + 18);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 80, 80);
+    const subText = 'Cantidad: ' + fmtTotal(data.cantidad) + ' u   ·   Total: $' + fmtTotal(data.precioTotal) + '   ·   Margen: ' + (data.margenPct ? data.margenPct.toFixed(1) + '%' : '—');
+    doc.text(subText, col2x, y + 18, { align: 'right' });
+
+    y += 36;
+
+    // Función para tabla
+    function drawTable(title, headers, rows, boldLast = 0) {
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(17, 17, 17);
+      doc.text(title, margin, y);
+      y += 5;
+
+      // Header row
+      doc.setFillColor(17, 17, 17);
+      doc.rect(margin, y, pw - margin*2, 7, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      const colW = (pw - margin*2) / headers.length;
+      headers.forEach((h, i) => doc.text(h, margin + colW*i + 3, y + 5));
+      y += 7;
+
+      rows.forEach((row, ri) => {
+        const isBold = boldLast > 0 && ri >= rows.length - boldLast;
+        const isLast = ri === rows.length - 1;
+        doc.setFillColor(ri % 2 === 0 ? 250 : 255, ri % 2 === 0 ? 250 : 255, ri % 2 === 0 ? 250 : 255);
+        if (isBold) doc.setFillColor(240, 240, 240);
+        doc.rect(margin, y, pw - margin*2, 6.5, 'F');
+        doc.setTextColor(isBold ? 17 : 60, isBold ? 17 : 60, isBold ? 17 : 60);
+        doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+        doc.setFontSize(isBold ? 8.5 : 8);
+        row.forEach((cell, i) => {
+          const x = i === 0 ? margin + 3 : margin + colW*(headers.length-1) + 3;
+          const align = i === 0 ? 'left' : 'right';
+          const xPos = i === 0 ? margin + 3 : col2x - 3;
+          doc.text(String(cell), xPos, y + 4.5, { align: i === 0 ? 'left' : 'right' });
+        });
+        doc.setDrawColor(220, 220, 220);
+        doc.setLineWidth(0.2);
+        if (!isLast) doc.line(margin, y + 6.5, pw - margin, y + 6.5);
+        y += 6.5;
+      });
+      doc.setDrawColor(180, 180, 180);
+      doc.setLineWidth(0.4);
+      doc.rect(margin, y - rows.length * 6.5 - 7, pw - margin*2, rows.length * 6.5 + 7);
+      y += 8;
+    }
+
+    drawTable('Detalle de la cotización', ['Descripción', 'Detalle'], datosRows);
+
+    // Footer
+    doc.setFillColor(245, 245, 245);
+    doc.rect(0, 287, pw, 10, 'F');
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(150, 150, 150);
+    doc.text('Button Company — Uso interno', margin, 293);
+    doc.text('Generado: ' + fecha, col2x, 293, { align: 'right' });
+
+    // Descargar
+    const nombreCliente = (data.cliente || 'cotizacion').replace(/\s+/g, '_').toLowerCase();
+    doc.save('cotizacion_' + nombreCliente + '_' + new Date().toISOString().slice(0,10) + '.pdf');
+  };
+  script.onerror = () => alert('No se pudo cargar jsPDF. Verificá tu conexión a internet.');
+  document.head.appendChild(script);
+}
+
+// ==============================
+//  LIMPIAR
+// ==============================
+function limpiarForm() {
+  if (material === 'zamak') {
+    ['z-cliente','z-obs','z-vendedor'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('z-cantidad').value = 10000;
+    document.getElementById('z-peso').value = 2;
+    document.getElementById('z-bocas').value = 6;
+    document.getElementById('z-tipoMatriz').value = 'Existente';
+    document.getElementById('z-costoMatriz').value = 0;
+    document.getElementById('z-roto').value = '2';
+    document.getElementById('z-banador').value = 'Balarino';
+    document.getElementById('z-mup').value = 2.2;
+    document.getElementById('z-adicional').value = 0;
+    document.getElementById('tog-armado').classList.remove('on');
+    document.getElementById('tog-bp').classList.add('on');
+    document.getElementById('bp-selector').style.display = '';
+  } else {
+    ['b-cliente','b-obs','b-vendedor'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('b-cantidad').value = 10000;
+    document.getElementById('b-tipoMatriz').value = 'Existente';
+    document.getElementById('b-bocas').value = 1;
+    document.getElementById('b-mup').value = 2.2;
+    document.getElementById('b-adicional').value = 0;
+    document.getElementById('tog-bronce-extra').classList.remove('on');
+    document.getElementById('bronce-extra-field').style.display = 'none';
+  }
+  if (material === 'zamak') calcular(); else calcularBronce();
+}
+
+// ==============================
+//  FORMATEO
+// ==============================
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  return parseFloat(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtTotal(n) {
+  if (!n && n !== 0) return '—';
+  return Math.round(n).toLocaleString('es-AR');
+}
+
+// ==============================
+//  INIT
+// ==============================
+document.addEventListener('DOMContentLoaded', () => {
+  loadPrecios();
+  calcular();
+  renderHistorico();
+});
+</script>
+</body>
+</html>
