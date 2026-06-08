@@ -572,12 +572,73 @@
 </head>
 <body>
 
+
+<div id="login-screen" style="
+  position:fixed; inset:0; background:#0f0f0f;
+  display:flex; align-items:center; justify-content:center;
+  z-index:9999; font-family:'DM Mono',monospace;">
+  <div style="width:320px;">
+    <div style="font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:#fff; margin-bottom:4px;">
+      COTIZADOR<span style="color:#3b82f6;"> DENIM BC</span>
+    </div>
+    <div style="font-size:11px; color:#555; margin-bottom:32px; letter-spacing:1px;">BUTTON COMPANY — USO INTERNO</div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:10px; letter-spacing:1px; text-transform:uppercase; color:#555; display:block; margin-bottom:6px;">Contraseña</label>
+      <input id="login-input" type="password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') checkPassword()"
+        style="width:100%; background:#181818; border:1px solid #2a2a2a; border-radius:6px;
+               color:#e8e8e8; font-family:'DM Mono',monospace; font-size:14px;
+               padding:10px 14px; outline:none; box-sizing:border-box;">
+    </div>
+    <div id="login-error" style="color:#f87171; font-size:11px; margin-bottom:10px; min-height:16px;"></div>
+    <button onclick="checkPassword()" style="
+      width:100%; background:#3b82f6; color:#fff; border:none; border-radius:6px;
+      font-family:'DM Mono',monospace; font-size:12px; font-weight:500;
+      letter-spacing:1px; text-transform:uppercase; padding:11px;
+      cursor:pointer;">Ingresar</button>
+  </div>
+</div>
+
+<script>
+  const PASS_ADMIN = 'button2026';
+  const PASS_USER  = 'denim2026';
+  let esAdmin = false;
+
+  function checkPassword() {
+    const val = document.getElementById('login-input').value;
+    if (val === PASS_ADMIN) {
+      esAdmin = true;
+      document.getElementById('login-screen').style.display = 'none';
+      mostrarTabsSegunRol();
+    } else if (val === PASS_USER) {
+      esAdmin = false;
+      document.getElementById('login-screen').style.display = 'none';
+      mostrarTabsSegunRol();
+    } else {
+      document.getElementById('login-error').textContent = 'Contraseña incorrecta';
+      document.getElementById('login-input').value = '';
+      document.getElementById('login-input').focus();
+    }
+  }
+
+  function mostrarTabsSegunRol() {
+    const btnPrecios = document.getElementById('tab-btn-precios');
+    if (!esAdmin) {
+      btnPrecios.style.display = 'none';
+    } else {
+      btnPrecios.style.display = '';
+    }
+  }
+
+  window.addEventListener('load', () => document.getElementById('login-input').focus());
+</script>
+
 <header>
   <div class="logo">COTIZADOR<span> DENIM BC</span></div>
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showTab('cotizador')">Cotizar</button>
     <button class="tab-btn" onclick="showTab('historico')">Histórico</button>
-    <button class="tab-btn" onclick="showTab('precios')">Precios</button>
+    <button id="tab-btn-precios" class="tab-btn" onclick="showTab('precios')">Precios</button>
   </div>
   <div style="font-size:11px; color:var(--muted); font-family:'DM Mono',monospace;">v2026</div>
 </header>
